@@ -31,6 +31,8 @@ class Game extends Phaser.Scene {
         // snow
         let tiles = [70,70,70, 105, 40,40,40, 165,50,50]
 
+
+        // https://www.desmos.com/calculator/4sz3lhfc4f
         var curved = (Math.cbrt(value-0.5)+1)/2
 
         var index = Math.floor(curved*tiles.length)
