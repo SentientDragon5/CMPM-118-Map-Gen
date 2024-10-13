@@ -1,0 +1,20 @@
+{"frames": {
+
+"mapPack_spritesheet.png":
+{
+	"frame": {"x":0,"y":0,"w":896,"h":896},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":896,"h":896},
+	"sourceSize": {"w":896,"h":896}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "kenneymap.png",
+	"format": "RGBA8888",
+	"size": {"w":896,"h":896},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:86aa0244941ba2248ffbe0a4b0b15a64:c21b53e4d192f32e91fb4fe7ff607d9e:6befcd4982c576e626e7c53410425630$"
+}
+}
