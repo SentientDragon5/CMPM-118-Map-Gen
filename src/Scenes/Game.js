@@ -21,9 +21,21 @@ class Game extends Phaser.Scene {
         this.load.path = "./assets/"
         this.load.image("tilesheet", "map/kenneymap.png")
     }
+    
+    // value is 0-1
+    eval_tile(value){
+        // water
+        // clay
+        // stone
+        // grass
+        // snow
+        let tiles = [70,70,70, 105, 40,40,40, 165,50,50]
 
-    eval_tile(){
-        
+        var curved = (Math.cbrt(value-0.5)+1)/2
+
+        var index = Math.floor(curved*tiles.length)
+        var tile = tiles[index]
+        return tile
     }
 
     create() {
@@ -31,9 +43,6 @@ class Game extends Phaser.Scene {
         let h = 200;
         let scale = 0.1
         var lvl = []
-        var raw = []
-
-        let tiles = [70, 105, 165, 40 ,50]
 
         noise.seed(Math.random());
 
@@ -44,16 +53,13 @@ class Game extends Phaser.Scene {
             // All noise functions return values in the range of -1 to 1.
             var value = noise.perlin2(x * scale, y * scale);
             var value = (value + 1)/2
-            var index = Math.floor(value*4)
             raw_row.push(Math.floor(value*100))
-            row.push(tiles[index])
+            row.push(this.eval_tile(value))
             //value*188/2+188/2
           }
           lvl.push(row)
-            console.log(raw_row)  
-          //raw.push(raw_row)
+            console.log(raw_row)
         }
-        //console.log(raw)
 
         const map = this.make.tilemap({
             data: lvl,

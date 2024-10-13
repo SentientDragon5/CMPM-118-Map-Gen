@@ -2,8 +2,8 @@
 // Phaser: 3.70.0
 "use strict"
 
-var canvas_x = 600;
-var canvas_y = 400;
+var canvas_x = 800;
+var canvas_y = 600;
 
 // game config
 let config = {
@@ -32,7 +32,7 @@ let config = {
 }
 
 var cursors;
-const SCALE = 0.1;
+const SCALE = 0.08;
 const PPU = 16;
 var my = {sprite: {}, text: {}};
 var world=0;
