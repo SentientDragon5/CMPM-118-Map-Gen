@@ -23,8 +23,13 @@ class Game extends Phaser.Scene {
     }
 
     create() {
+        let w = 5;
+        let h = 5;
+
+        let scale = 1
+
         let a= this.getRandomInt(188)
-        const lvl = [
+        var lvl = [
             [a,a,a,0,0],
             [0,0,0,0,0],
             [0,0,a,2,0],
@@ -32,6 +37,21 @@ class Game extends Phaser.Scene {
             [0,0,0,0,0],
             [0,0,0,0,0]
         ]
+
+
+        noise.seed(Math.random());
+
+        for (var x = 0; x < w; x++) {
+          for (var y = 0; y < h; y++) {
+            // All noise functions return values in the range of -1 to 1.
+        
+            // noise.simplex2 and noise.perlin2 for 2d noise
+            var value = noise.perlin2(x / 100, y / 100);
+            lvl[x][y] = value * 188
+            //image[x][y].r = Math.abs(value) * 256; // Or whatever. Open demo.html to see it used with canvas.
+          }
+        }
+
 
         const map = this.make.tilemap({
             data: lvl,      // load direct from array
