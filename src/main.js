@@ -2,8 +2,8 @@
 // Phaser: 3.70.0
 "use strict"
 
-var canvas_x = 800;
-var canvas_y = 600;
+var canvas_x = 512;
+var canvas_y = 512;
 
 // game config
 let config = {

@@ -41,12 +41,34 @@ class Game extends Phaser.Scene {
     }
 
     create() {
-        let w = 200;
-        let h = 200;
         let scale = 0.1
+        let step = 0.01
+        let seed = Math.random()
+
+        this.input.keyboard.on('keydown-R', () => {
+            seed = Math.random()
+            this.makeMap(seed, scale)
+        }, this);
+
+        this.input.keyboard.on('keydown-PERIOD', () => {
+            scale -= step
+            this.makeMap(seed, scale)
+        }, this);
+
+        this.input.keyboard.on('keydown-COMMA', () => {
+            scale += step
+            this.makeMap(seed, scale)
+        }, this);
+
+        this.makeMap(seed,scale)
+    }
+    
+    makeMap(seed, scale=0.1){
+        let w = 100;
+        let h = 100;
         var lvl = []
 
-        noise.seed(Math.random());
+        noise.seed(seed);
 
         for (var x = 0; x < w; x++) {
             let row = []
@@ -71,12 +93,9 @@ class Game extends Phaser.Scene {
         const tilesheet = map.addTilesetImage("tilesheet")
         var layer = map.createLayer(0, tilesheet, 0, 0)
         layer.setScale(SCALE)
-        
-        this.input.keyboard.on('keydown-R', () => {
-            this.scene.start("game")
-        }, this);
-        // this.cameras.main.setBounds(0, 0, PPU*mapW*SCALE, PPU*mapH*SCALE);
     }
+
+    
     // generate a random number between 0 and max
     getRandomInt(max) {
         return Math.floor(Math.random() * max)
