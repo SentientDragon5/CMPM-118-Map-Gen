@@ -22,45 +22,48 @@ class Game extends Phaser.Scene {
         this.load.image("tilesheet", "map/kenneymap.png")
     }
 
+    eval_tile(){
+        
+    }
+
     create() {
-        let w = 5;
-        let h = 5;
+        let w = 200;
+        let h = 200;
+        let scale = 0.1
+        var lvl = []
+        var raw = []
 
-        let scale = 1
-
-        let a= this.getRandomInt(188)
-        var lvl = [
-            [a,a,a,0,0],
-            [0,0,0,0,0],
-            [0,0,a,2,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0]
-        ]
-
+        let tiles = [70, 105, 165, 40 ,50]
 
         noise.seed(Math.random());
 
         for (var x = 0; x < w; x++) {
+            let row = []
+            let raw_row = []
           for (var y = 0; y < h; y++) {
             // All noise functions return values in the range of -1 to 1.
-        
-            // noise.simplex2 and noise.perlin2 for 2d noise
-            var value = noise.perlin2(x / 100, y / 100);
-            lvl[x][y] = value * 188
-            //image[x][y].r = Math.abs(value) * 256; // Or whatever. Open demo.html to see it used with canvas.
+            var value = noise.perlin2(x * scale, y * scale);
+            var value = (value + 1)/2
+            var index = Math.floor(value*4)
+            raw_row.push(Math.floor(value*100))
+            row.push(tiles[index])
+            //value*188/2+188/2
           }
+          lvl.push(row)
+            console.log(raw_row)  
+          //raw.push(raw_row)
         }
-
+        //console.log(raw)
 
         const map = this.make.tilemap({
-            data: lvl,      // load direct from array
-            tileWidth: 16,
-            tileHeight: 16
+            data: lvl,
+            tileWidth: 64,
+            tileHeight: 64
         })
         const tilesheet = map.addTilesetImage("tilesheet")
-        const layer = map.createLayer(0, tilesheet, 0, 0)
-
+        var layer = map.createLayer(0, tilesheet, 0, 0)
+        layer.setScale(SCALE)
+        
         this.input.keyboard.on('keydown-R', () => {
             this.scene.start("game")
         }, this);
