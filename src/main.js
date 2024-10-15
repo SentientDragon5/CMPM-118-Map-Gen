@@ -32,7 +32,7 @@ let config = {
 }
 
 var cursors;
-const SCALE = 0.08;
+const SCALE = 0.5;//0.08;
 const PPU = 16;
 var my = {sprite: {}, text: {}};
 var world=0;
