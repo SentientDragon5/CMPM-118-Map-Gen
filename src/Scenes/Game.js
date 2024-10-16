@@ -30,7 +30,7 @@ class Game extends Phaser.Scene {
         // grass 165
         // snow 50
         
-        this.tile_order = [0,1,2]
+        this.tile_order = [0,1,2,3]
 
 
         // Old
@@ -146,6 +146,16 @@ class Game extends Phaser.Scene {
                 "tile" : 70
             },
             1 : {
+                "name" : "sand",
+                "type" : "edges",
+                "tile" : 110,
+                "out_edge" : [
+                    42,28,14,
+                    124,110,96,
+                    94,80,81
+                ]
+            },
+            2 : {
                 "name" : "grass",
                 "type" : "edges",
                 "tile" : 40,
@@ -158,7 +168,7 @@ class Game extends Phaser.Scene {
                     12,193
                 ]
             },
-            2 : {
+            3 : {
                 "name" : "snow",
                 "type" : "edges",
                 "tile" : 50,
@@ -248,6 +258,8 @@ class Game extends Phaser.Scene {
                         currentTile = 0
                     } else if(currentTile == 2){
                         currentTile = 1
+                    } else if(currentTile == 3){
+                        currentTile = 2
                     }
                 }
                 lvl[x][y] = tileTypes[currentTile]["tile"]
