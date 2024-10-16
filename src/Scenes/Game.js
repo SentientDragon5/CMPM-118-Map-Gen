@@ -29,34 +29,8 @@ class Game extends Phaser.Scene {
         // stone 40
         // grass 165
         // snow 50
-        var water = {
-            "name" : "water",
-            "type" : "no_edges",
-            "tile" : 70,
-            "edge" : []
-        }
-        // Format: center, 
-        // up, up right, right, down right,
-        // down, down left, left, up left,
-        // inner
-        // up right, down right, down left
-        // up left
         
-        var grass = {
-            "name" : "grass",
-            "type" : "edges",
-            "tile" : 40,
-            "out_edge" : [
-                [69,55,41],
-                [40,40,26],
-                [24,25,11]],
-            "in_edge" : [
-                [27,13],
-                [12,193]
-            ]
-        }
-        
-        let tiles = [70, 40, 165]
+        this.tile_order = [0,1,2]
 
 
         // Old
@@ -68,8 +42,8 @@ class Game extends Phaser.Scene {
         var v = 0.38
         var curved = v * Math.atan(u * (value - 0.5)) + 0.5
         
-        var index = Math.floor(curved*tiles.length)
-        var tile = tiles[index]
+        var index = Math.floor(curved*this.tile_order.length)
+        var tile = this.tile_order[index]
         return tile
     }
 
@@ -97,11 +71,11 @@ class Game extends Phaser.Scene {
     }
     
     makeMap(seed, scale=0.1){
-        let w = 20;
-        let h = 20;
+        let w = 32;
+        let h = 32;
         var lvl = []
 
-        let is_debug_map = true;
+        let is_debug_map = false;
         if (is_debug_map){
             w = 14;
             h = 14;
@@ -132,17 +106,23 @@ class Game extends Phaser.Scene {
         }
 
         if (!is_debug_map){
-            lvl = this.genBorders(lvl,w,h);
         }
 
-        const map = this.make.tilemap({
-            data: lvl,
-            tileWidth: 64,
-            tileHeight: 64
-        })
-        const tilesheet = map.addTilesetImage("tilesheet")
-        var layer = map.createLayer(0, tilesheet, 0, 0)
-        layer.setScale(SCALE)
+        let lvls = [lvl]
+        if (!is_debug_map){
+            lvls = this.genBorders(lvl,w,h);
+        }
+
+        lvls.forEach(l => {
+            const map = this.make.tilemap({
+                data: l,
+                tileWidth: 64,
+                tileHeight: 64
+            })
+            const tilesheet = map.addTilesetImage("tilesheet")
+            var layer = map.createLayer(0, tilesheet, 0, 0)
+            layer.setScale(SCALE)
+        });
 
         if (is_debug_map){
             for (var x = 0; x < w; x++) {
@@ -158,9 +138,47 @@ class Game extends Phaser.Scene {
     }
 
     genBorders(lvl,w,h){
+
+        var tileTypes = {
+            0 : {
+                "name" : "water",
+                "type" : "no_edges",
+                "tile" : 70
+            },
+            1 : {
+                "name" : "grass",
+                "type" : "edges",
+                "tile" : 40,
+                "out_edge" : [
+                    69,55,41,
+                    40,40,26,
+                    24,25,11],
+                "in_edge" : [
+                    27,13,
+                    12,193
+                ]
+            },
+            2 : {
+                "name" : "snow",
+                "type" : "edges",
+                "tile" : 50,
+                "out_edge" : [
+                    79,65,51,
+                    64,50,36,
+                    49,20,21
+                ]
+            }
+        } 
+        // Format: center, 
+        // up, up right, right, down right,
+        // down, down left, left, up left,
+        // inner
+        // up right, down right, down left
+        // up left
+
         let borderLvl = []; // Initialize an empty array for border tiles
 
-        let NO_TILE = -1;
+        let NO_TILE = 195;
 
         borderLvl.push(Array(w).fill(NO_TILE));//pad
         for (let x = 1; x < w - 1; x++) {
@@ -168,15 +186,43 @@ class Game extends Phaser.Scene {
             borderRow.push(NO_TILE); //pad
             for (let y = 1; y < h - 1; y++) {
                 let currentTile = lvl[x][y];
+                console.log(currentTile, " ", currentTile in tileTypes);
+                if (!(currentTile in tileTypes)){
+                    borderRow.push(NO_TILE);
+                    continue;
+                }
+                
+                let tile_info = tileTypes[currentTile];
+                console.log(tile_info)
+                if (tile_info["type"] == "no_edges"){
+                    borderRow.push(NO_TILE);
+                    continue;
+                }
+
                 let neighbors = [
                     lvl[x][y - 1],  // Top
-                    lvl[x][y + 1],  // Bottom
                     lvl[x - 1][y],  // Left
-                    lvl[x + 1][y]   // Right
+                    lvl[x + 1][y],   // Right
+                    lvl[x][y + 1]  // Bottom
                 ];
     
                 if (neighbors.some(neighbor => neighbor !== currentTile)) {
-                    borderRow.push(1); // Replace with your logic for selecting the border tile
+                    var tile = 182;
+                    tile = tile_info["out_edge"][4]
+                    if (neighbors[2] < currentTile){
+                        tile = 72;
+                        tile = tile_info["out_edge"][7];
+                    } else if (neighbors[1] < currentTile){
+                        tile = 29;
+                        tile = tile_info["out_edge"][1];
+                    } else if (neighbors[0] < currentTile){
+                        tile = 1;
+                        tile = tile_info["out_edge"][3];
+                    } else if (neighbors[3] < currentTile){
+                        tile = 15;
+                        tile = tile_info["out_edge"][5];
+                    }
+                    borderRow.push(tile); // Replace with your logic for selecting the border tile
                 } else {
                     borderRow.push(NO_TILE); // Use -1 to indicate no border tile
                 }
@@ -186,15 +232,29 @@ class Game extends Phaser.Scene {
         }
         borderLvl.push(Array(w).fill(NO_TILE));//pad
 
+        // for (let x=0; x<w; x++){
+        //     for(let y=0; y<h; y++){
+        //         if (borderLvl[x][y] != NO_TILE){
+        //             lvl[x][y] = borderLvl[x][y];
+        //         }
+        //     }
+        // }
         for (let x=0; x<w; x++){
             for(let y=0; y<h; y++){
-                if (borderLvl[x][y] != NO_TILE){
-                    lvl[x][y] = borderLvl[x][y];
+                let currentTile = lvl[x][y];
+                if(borderLvl[x][y] != NO_TILE){
+                    
+                    if(currentTile == 1){
+                        currentTile = 0
+                    } else if(currentTile == 2){
+                        currentTile = 1
+                    }
                 }
+                lvl[x][y] = tileTypes[currentTile]["tile"]
             }
         }
-
-        return lvl
+        
+        return [lvl,borderLvl];
     }
 
     
