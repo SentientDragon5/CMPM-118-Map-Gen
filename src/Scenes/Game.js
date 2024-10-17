@@ -305,21 +305,32 @@ class Game extends Phaser.Scene {
         return [lvl,borderLvl];
     }
 
-    genName(type, size){
-        if(type == 0){
-            return "Sea"
-        }else if (type == 1){
-            return "beach"
-        } 
-        else if (type == 2){
-            return "Land"
-        } else if (type == 3){
-            return "Mountains"
-        }
-        else{
-            return "Locatain"
-        }
-    }
+    genName(type) {
+        const prefixes = {
+          0: ["Blue", "Deep", "Coral", "Silver", "Jade", "Mystic", "Azure", "Crystal", "Oceanic", "Whispering"],
+          1: ["Dune", "Golden", "Sandy", "Sunken", "Whispering", "Ancient", "Lost", "Ember", "Scarlet", "Windswept"],
+          2: ["Emerald", "Vast", "Rolling", "Whispering", "Golden", "Sunlit", " Verdant", "Serene", "Painted", "Flourishing"],
+          3: ["Jagged", "Towering", "Skyreach", "Ancient", "Misty", "Frostbite", "Iron", "Stone", "Shadow", "Sunstone"]
+        };
+      
+        const suffixes = {
+          0: ["Ocean", "Sea", "Lake", "River", "Bay", "Lagoon", "Falls", "Currents", "Depths", "Tides"],
+          1: ["Dunes", "Sands", "Desert", "Beach", "Shores", "Oasis", "Mesa", "Canyon", "Plains", "Expanse"],
+          2: ["Plains", "Fields", "Meadows", "Prairie", "Savanna", "Steppe", "Valley", "Grasslands", "Expanse", "Vista"],
+          3: ["Mountains", "Peaks", "Highlands", "Ridge", "Cliff", "Summit", "Pass", "Valley", "Crag", "Massif"]
+        };
+      
+        // Generate a random prefix
+        const randomPrefix = prefixes[type][Math.floor(Math.random() * prefixes[type].length)];
+      
+        // Generate a random suffix
+        const randomSuffix = suffixes[type][Math.floor(Math.random() * suffixes[type].length)];
+      
+        // Combine to create the name
+        const name = `${randomPrefix} ${randomSuffix}`;
+      
+        return name;
+      }
 
     findTileGroups(grid) {
         const numRows = grid.length;
