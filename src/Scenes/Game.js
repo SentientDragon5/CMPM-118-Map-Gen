@@ -20,6 +20,8 @@ class Game extends Phaser.Scene {
         // get assets
         this.load.path = "./assets/"
         this.load.image("tilesheet", "map/kenneymap.png")
+        
+        this.load.image("player", "mapTile_137.png");
     }
     
     // value is 0-1
@@ -68,6 +70,9 @@ class Game extends Phaser.Scene {
         }, this);
 
         this.makeMap(seed,scale)
+
+        my.sprite.player = this.add.sprite(0, 0, "player");
+        my.sprite.player.scale = 0.5;
     }
     
     makeMap(seed, scale=0.1){
@@ -276,5 +281,15 @@ class Game extends Phaser.Scene {
     }
 
     update() {
+        this.moveSpeed = 5;
+
+        let dx = (this.input.keyboard.addKey('A').isDown ? -1 : 0
+            + this.input.keyboard.addKey('D').isDown ? 1 : 0) * this.moveSpeed;
+        let dy = (this.input.keyboard.addKey('W').isDown ? -1 : 0
+        + this.input.keyboard.addKey('S').isDown ? 1 : 0) * this.moveSpeed;
+        my.sprite.player.x += dx;
+        my.sprite.player.y += dy;
+        if(dx < -0.1) my.sprite.player.flipX = true;
+        if(dx > 0.1)  my.sprite.player.flipX = false;
     }
 }
