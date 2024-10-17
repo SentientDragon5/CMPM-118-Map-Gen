@@ -50,6 +50,8 @@ class Game extends Phaser.Scene {
     }
 
     create() {
+        this.maps = [];
+        this.locations = [];
         let scale = 0.1
         let step = 0.01
         let seed = Math.random()
@@ -73,9 +75,18 @@ class Game extends Phaser.Scene {
 
         my.sprite.player = this.add.sprite(0, 0, "player");
         my.sprite.player.scale = 0.5;
+        my.sprite.player.depth = 100;
     }
     
     makeMap(seed, scale=0.1){
+        // clean up old
+        this.maps.forEach(element => {
+            element.destroy();
+        });
+        this.locations.forEach(element => {
+            element.destroy();
+        });
+
         let w = 32;
         let h = 32;
         var lvl = []
@@ -113,10 +124,29 @@ class Game extends Phaser.Scene {
         if (!is_debug_map){
         }
 
+        if(!is_debug_map){
+            var groups = this.findTileGroups(lvl);
+            groups.forEach(element => {
+                var type = element[0]
+                var center = element[1]
+                var size = 16;
+                var name = this.genName(type,center[2]);
+                var text = this.add.text(Math.floor(center[1]*size),Math.floor(center[0]*size), name, {
+                    "fontSize" : 8,
+                    "backgroundColor" : "000000"
+                })
+                text.depth = 1;
+                this.locations.push(text);
+                console.log(center)
+            });
+            console.log(groups)
+        }
+
         let lvls = [lvl]
         if (!is_debug_map){
             lvls = this.genBorders(lvl,w,h);
         }
+
 
         lvls.forEach(l => {
             const map = this.make.tilemap({
@@ -126,7 +156,8 @@ class Game extends Phaser.Scene {
             })
             const tilesheet = map.addTilesetImage("tilesheet")
             var layer = map.createLayer(0, tilesheet, 0, 0)
-            layer.setScale(SCALE)
+            layer.setScale(SCALE);
+            this.maps.push(layer);
         });
 
         if (is_debug_map){
@@ -201,14 +232,14 @@ class Game extends Phaser.Scene {
             borderRow.push(NO_TILE); //pad
             for (let y = 1; y < h - 1; y++) {
                 let currentTile = lvl[x][y];
-                console.log(currentTile, " ", currentTile in tileTypes);
+                //console.log(currentTile, " ", currentTile in tileTypes);
                 if (!(currentTile in tileTypes)){
                     borderRow.push(NO_TILE);
                     continue;
                 }
                 
                 let tile_info = tileTypes[currentTile];
-                console.log(tile_info)
+                //console.log(tile_info)
                 if (tile_info["type"] == "no_edges"){
                     borderRow.push(NO_TILE);
                     continue;
@@ -274,7 +305,70 @@ class Game extends Phaser.Scene {
         return [lvl,borderLvl];
     }
 
-    
+    genName(type, size){
+        if(type == 0){
+            return "Sea"
+        }else if (type == 1){
+            return "beach"
+        } 
+        else if (type == 2){
+            return "Land"
+        } else if (type == 3){
+            return "Mountains"
+        }
+        else{
+            return "Locatain"
+        }
+    }
+
+    findTileGroups(grid) {
+        const numRows = grid.length;
+        const numCols = grid[0].length;
+        const visited = new Array(numRows).fill(0).map(() => new Array(numCols).fill(false));
+        const groups = [];
+      
+        for (let row = 0; row < numRows; row++) {
+          for (let col = 0; col < numCols; col++) {
+            if (!visited[row][col]) {
+              const tileType = grid[row][col];
+              const group = this.exploreGroup(grid, visited, row, col, tileType);
+              groups.push([tileType, this.calculateCenter(group)]);
+            }
+          }
+        }
+      
+        return groups;
+      }
+      
+    exploreGroup(grid, visited, row, col, tileType) {
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length || visited[row][col] || grid[row][col] !== tileType) {
+          return [];
+        }
+      
+        visited[row][col] = true;
+        const group = [[row, col]];
+      
+        // Explore adjacent cells
+        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        for (const [dr, dc] of directions) {
+          group.push(...this.exploreGroup(grid, visited, row + dr, col + dc, tileType));
+        }
+      
+        return group;
+      }
+      
+    calculateCenter(group) {
+        let sumRows = 0;
+        let sumCols = 0;
+        const size = group.length; // Calculate the size of the group
+      
+        for (const [row, col] of group) {
+          sumRows += row;
+          sumCols += col;
+        }
+        return [sumRows / size, sumCols / size, size]; // Return center coordinates and size
+      }
+
     // generate a random number between 0 and max
     getRandomInt(max) {
         return Math.floor(Math.random() * max)
@@ -289,6 +383,7 @@ class Game extends Phaser.Scene {
         + this.input.keyboard.addKey('S').isDown ? 1 : 0) * this.moveSpeed;
         my.sprite.player.x += dx;
         my.sprite.player.y += dy;
+        console.log(my.sprite.player.x, my.sprite.player.y);
         if(dx < -0.1) my.sprite.player.flipX = true;
         if(dx > 0.1)  my.sprite.player.flipX = false;
     }
